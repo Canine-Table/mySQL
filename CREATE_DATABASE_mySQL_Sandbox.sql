@@ -1,0 +1,4 @@
+CREATE DATABASE mySQL_Sandbox;
+USE mySQL_Sandbox;
+DROP DATABASE mySQL_Sandbox;
+ALTER DATABASE mySQL_Sandbox READ ONLY = 1;
