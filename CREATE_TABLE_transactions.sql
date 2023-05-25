@@ -37,8 +37,7 @@ CREATE TABLE transactions(
 
 ALTER TABLE transactions AUTO_INCREMENT=1000;
 
-INSERT INTO transactions (transaction_amount)
-VALUES (4.53);
+INSERT INTO transactions (transaction_amount) VALUES (4.53);
 
 CREATE TABLE customers (
     customer_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -103,7 +102,3 @@ SELECT SUM(transaction_amount) AS Total FROM transactions;
 SELECT CONCAT(first_name,last_name) AS full_name FROM customers;
 SELECT CONCAT(first_name,' ',last_name) AS full_name FROM customers;
 
-/* Conditionals */
-
-ALTER TABLE employees ADD COLUMN job_title VARCHAE(50) AFTER hourly_pay;
-UPDATE employees SET job_title = 'employee';
