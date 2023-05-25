@@ -238,3 +238,144 @@ SELECT first_name, last_name FROM customers WHERE customer_id IN (SELECT DISTINC
 -- aggregate all rows by a specific column
 -- often usesd with aggregate functions such as
 -- ex. SUM(), MAX(), MIN(), AVG(), COUNT()
+
+SELECT SUM(transaction_amount) FROM transactions GROUP BY transaction_datetime;
+SELECT transaction_datetime AS date, SUM(transaction_amount) AS total_revenu FROM transactions GROUP BY transaction_datetime;
+SELECT AVG(transaction_amount) AS total_revenu, transaction_datetime AS the_date FROM transactions GROUP BY transaction_datetime;
+SELECT MAX(transaction_amount) AS total_revenu, transaction_datetime AS the_date FROM transactions GROUP BY transaction_datetime;
+SELECT SUM(transaction_amount) AS total_revenu FROM transactions GROUP by customer_id HAVING COUNT(transaction_amount) > 1 AND customer_id IS NOT NULL;
+
+-- ROLLUP
+-- extention of the GROUP BY clause
+-- produces another row and shows the GRAND TOTAL (super-aggregate value)
+
+SELECT SUM(transaction_amount) AS total_cost, transaction_datetime AS purchase_date FROM transactions GROUP BY transaction_datetime WITH ROLLUP;
+SELECT SUM(hourly_pay) AS hourly_pay, employee_id FROM employees GROUP BY employee_id WITH ROLLUP;
+
+-- FK = Foreign Key
+
+-- ON DELETE SET NULL
+-- When a FK is deleted, replace FK with NULL
+
+-- ON DELETE CASCADE
+-- When FK is deleted, delete the row
+
+SET foreign_key_checks = 0;
+DELETE FROM customers WHERE customer_id = 4;
+
+CREATE TABLE employees (
+	employee_id INT, 
+	first_name VARCHAR(50),
+	last_name VARCHAR(50), 
+	hourly_pay DECIMAL(5, 2), 
+	hire_date DATE,
+	hire_time DATETIME
+);
+
+CREATE TABLE employees (
+	employee_id INT PRIMARY KEY, 
+	first_name VARCHAR(50),
+	last_name VARCHAR(50), 
+	hourly_pay DECIMAL(5, 2), 
+	hire_date DATE,
+	hire_time DATETIME
+	FOREIGN KEY(customer_id) REFERENCES customers(customer_id) ON DELETE SET CASCADE
+);
+
+ALTER TABLE transactions ADD CONSTRAINT fk_customer_idx 
+FOREIGN KEY(customer_id) REFERENCES customers(customer_id) ON DELETE SET NULL;
+
+-- Stored Precedure
+-- is prepared SQL code that you can save
+-- great if there's a query that you write often
+
+DELIMITER $$
+CREATE PROCEDURE get_employee_id(IN id INT)
+BEGIN
+SELECT employee_id AS staff_id, 
+CONCAT_WS(' ',first_name,last_name) AS full_name, 
+hourly_pay AS pay_scale FROM employees WHERE employee_id = id;
+END $$
+DELIMITER ;
+
+CALL get_employee_id(1);
+DROP get_employee_id();
+
+DELIMITER $$
+CREATE PROCEDURE get_employee_id_range(IN id_one INT,IN id_two INT)
+BEGIN
+SELECT employee_id AS staff_id, 
+CONCAT_WS(' ',first_name,last_name) AS full_name, 
+hourly_pay AS pay_scale FROM employees WHERE employee_id BETWEEN id_one AND id_two;
+END $$
+DELIMITER ;
+
+CALL get_employee_id_range(1,6)
+DROP get_employee_id_range()
+
+-- Trigger
+-- When an event happens, do something
+-- ex. (INSERT, UPDATE, DELETE)
+-- check data, handles errors, auditing tables
+
+ALTER TABLE employees ADD COLUMN current_salary DECIMAL(10,2) AFTER hourly_pay;
+UPDATE employees SET current_salary = hourly_pay * 2080;
+
+CREATE TRIGGER before_hourly_pay_update
+BEFORE UPDATE ON employees FOR EACH ROW
+SET NEW.current_salary = NEW.hourly_pay * 2080;
+
+SHOW TRIGGERS;
+
+UPDATE employees SET hourly_pay = 150 WHERE employee_id = 1;
+UPDATE employees SET hourly_pay = hourly_pay + 1.50;
+
+CREATE TRIGGER before_hourly_pay_insert 
+BEFORE INSERT ON employees FOR EACH ROW SET NEW.current_salary = NEW.hourly_pay * 2080;
+
+CREATE TABLE costs(
+	cost_id INT PRIMARY KEY AUTO_INCREMENT,
+	cost_name VARCHAR(50) DEFAULT 'None',
+	cost_total DECIMAL(10,2) DEFAULT 0.00
+);
+
+INSERT INTO costs(cost_name) VALUES ('salaries'),('supplies'),('taxes');
+
+UPDATE costs
+SET cost_total = (SELECT SUM(current_salary) FROM employees) 
+WHERE cost_name = 'salaries'
+
+CREATE TRIGGER get_total_salaries
+BEFORE DELETE ON costs FOR EACH ROW 
+UPDATE costs
+SET cost_total = (SELECT SUM(current_salary) FROM employees) 
+WHERE cost_name = salaries
+
+
+DELIMITER $$
+CREATE PROCEDURE add_e()
+BEGIN
+INSERT INTO employees(employee_id) VALUES (7);
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE del_e()
+BEGIN
+DELETE FROM employees WHERE employee_id = 7;
+END $$
+DELIMITER ;
+
+CREATE TRIGGER before_hourly_pay_is_updated
+BEFORE UPDATE ON employees FOR EACH ROW
+SET NEW.current_salary = (NEW.hourly_pay * 2080);
+
+CREATE TRIGGER get_total_cost_after_update
+AFTER UPDATE ON employees FOR EACH ROW
+UPDATE costs SET cost_total = (SELECT SUM(current_salary / 0.14) FROM employees)
+WHERE cost_name = taxes;
+
+CREATE TRIGGER before_hourly_pay_is_inserted
+BEFORE INSERT ON employees
+FOR EACH ROW
+SET NEW.current_salary = (NEW.hourly_pay * 2080);

@@ -102,3 +102,17 @@ SELECT SUM(transaction_amount) AS Total FROM transactions;
 SELECT CONCAT(first_name,last_name) AS full_name FROM customers;
 SELECT CONCAT(first_name,' ',last_name) AS full_name FROM customers;
 
+-- Stored Precedure
+-- is prepared SQL code that you can save
+-- great if there's a query that you write often
+
+DELIMITER $$
+CREATE PROCEDURE get_customer_id()
+BEGIN
+SELECT transaction_id,transaction_amount,first_name,last_name 
+FROM transactions INNER JOIN customers ON transactions.customer_id = customers.customer_id;
+END $$
+DELIMITER ;
+
+CALL get_customer_id();
+DROP get_customer_id();
