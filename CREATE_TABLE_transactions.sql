@@ -69,7 +69,41 @@ DELETE FROM transactions;
 INSERT INTO transactions(transaction_amount,customer_id) VALUES
 (3.99,1);
 
+
+INSERT INTO customers(first_name,last_name) VALUES 
+('Larry','Lobster'), 
+('Bubble','Bass'), 
+('Poppy','Puff'), 
+('Fred','Fish');
+
+
 /* Joining tables */
 
+
+/* Inner Join */
 SELECT * FROM transactions INNER JOIN customers
-ON transaction_id.customer_id = customers.customer_id;
+ON transactions.customer_id = customers.customer_id;
+
+SELECT transaction_id,transaction_amount,first_name,last_name 
+FROM transactions INNER JOIN customers ON transactions.customer_id = customers.customer_id;
+
+/* Left Join */
+SELECT * FROM transactions LEFT JOIN customers ON transactions.customer_id = customers.customer_id;
+
+/* Right Join */
+SELECT * FROM transactions RIGHT JOIN customers ON transactions.customer_id = customers.customer_id;
+
+/* Functions */
+
+SELECT COUNT(customer_id) AS IDs FROM transactions;
+SELECT MAX(transaction_amount) AS Maximum FROM transactions;
+SELECT MIN(transaction_amount) AS Minimum FROM transactions;
+SELECT AVG(transaction_amount) AS Average FROM transactions;
+SELECT SUM(transaction_amount) AS Total FROM transactions;
+SELECT CONCAT(first_name,last_name) AS full_name FROM customers;
+SELECT CONCAT(first_name,' ',last_name) AS full_name FROM customers;
+
+/* Conditionals */
+
+ALTER TABLE employees ADD COLUMN job_title VARCHAE(50) AFTER hourly_pay;
+UPDATE employees SET job_title = 'employee';
