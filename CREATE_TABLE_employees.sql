@@ -163,6 +163,7 @@ INSERT INTO expenses VALUES (1000000.00),(50000.00),(125000.00),(-250000.00),(-5
 SELECT * FROM income UNION SELECT * FROM expenses;
 SELECT first_name,last_name FROM employees UNION SELECT first_name,last_name FROM customers;
 SELECT first_name,last_name FROM employees UNION ALL SELECT first_name,last_name FROM customers; 
+
 -- UNION ALL will also display duplicate values
 
 -- SELF JOIN

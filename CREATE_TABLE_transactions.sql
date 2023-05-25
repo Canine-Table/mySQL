@@ -68,16 +68,13 @@ DELETE FROM transactions;
 INSERT INTO transactions(transaction_amount,customer_id) VALUES
 (3.99,1);
 
-
 INSERT INTO customers(first_name,last_name) VALUES 
 ('Larry','Lobster'), 
 ('Bubble','Bass'), 
 ('Poppy','Puff'), 
 ('Fred','Fish');
 
-
 /* Joining tables */
-
 
 /* Inner Join */
 SELECT * FROM transactions INNER JOIN customers
